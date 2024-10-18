@@ -1,5 +1,7 @@
 import socket
+import math
 open = []
+closed = []
 
 # Function to scan a single port
 def port_scanner(target, port):
@@ -9,11 +11,38 @@ def port_scanner(target, port):
     try:
         result = scanner.connect_ex((target, port))  # Connect to target and port
         if result == 0:  # If connection succeeds, port is open
-            open.append(f"Port {port} is open")
+            open.append(port)
+        else:
+            closed.append(port)
     except socket.error as err:
         print(f"Error scanning port {port}: {err}")
     finally:
         scanner.close()
+
+def display_closed(closed, start_port):
+    closed_ports = []
+    from_port = closed[0]
+    past_port = closed[0]
+    until_port = 0
+    for port in closed:
+        if past_port == start_port:
+            until_port = port
+        elif past_port + 1 == port:
+            until_port = port
+        else:
+            closed_ports.append(f"Closed from port {from_port} to port {until_port}")
+            from_port =  port
+        past_port = port
+    closed_ports.append(f"Closed from port {from_port} to port {until_port}")
+    return closed_ports
+        
+
+def display_open(open):
+    open_string = []
+    for port in open:
+        open_string.append(f"Open on port {port}.")
+    return open_string
+
 
 # Main part of the script: getting user input and scanning the specified range of ports
 if __name__ == "__main__":
@@ -28,6 +57,10 @@ if __name__ == "__main__":
     # Scan each port in the range
     for port in range(start_port, end_port + 1):
         port_scanner(target, port)
+        if port%10 == 0:
+            percent = math.ceil((port / (end_port + 1)) * 100)
+            print(f"> {percent}%")
 
-    print("\nPort scanning completed.")
-    print(open)
+    print("\n> Port scanning completed.")
+    print(f"> {display_open(open)}")
+    print(f"> {display_closed(closed, start_port)}")
