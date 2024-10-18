@@ -1,15 +1,15 @@
 import socket
+open = []
 
 # Function to scan a single port
 def port_scanner(target, port):
+    global open
     scanner = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
-    scanner.settimeout(1)  # Timeout for each connection attempt
+    scanner.settimeout(0.2)  # Timeout for each connection attempt
     try:
         result = scanner.connect_ex((target, port))  # Connect to target and port
         if result == 0:  # If connection succeeds, port is open
-            print(f"Port {port} is open")
-        else:
-            print(f"Port {port} is closed")
+            open.append(f"Port {port} is open")
     except socket.error as err:
         print(f"Error scanning port {port}: {err}")
     finally:
@@ -30,3 +30,4 @@ if __name__ == "__main__":
         port_scanner(target, port)
 
     print("\nPort scanning completed.")
+    print(open)
